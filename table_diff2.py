@@ -15,7 +15,8 @@ def get_column_widths(df, column_list):
     # get length of longest value in each column
     for ix, _ in enumerate(column_list):
         # column_widths.append(max(len(str(row[ix])) for _, row in enumerate(df[column_list].itertuples(index=False), 1)))    
-        column_widths.append(max(len(str(row[ix])) for row in df[column_list].itertuples(index=False)))    
+        # column_widths.append(max(len(str(row[ix])) for row in df[column_list].itertuples(index=False)))    
+        column_widths.append(max(len(df[column_list].astype(str))))
 
     # adjust column width if label is longer than all column entries
     for ix, _ in enumerate(column_widths):
@@ -23,6 +24,8 @@ def get_column_widths(df, column_list):
 
     return column_widths
 
+def get_longest_entry(df_column):
+    return max(df_column.astype(str).apply(len))
 
 def get_column_widths2(df1, df2, column_list):
     """calculate column widths for a text table
@@ -35,20 +38,18 @@ def get_column_widths2(df1, df2, column_list):
     Returns:
         list -- list containing the length of each column
     """
-    # column_widths, column_widths1, column_widths2, label_lengths = [], [], [], []
-    column_widths, column_widths1, column_widths2 = [], [], []
-
     # get length of lable for each column
     label_lengths = [len(col) for col in column_list]
 
-    for ix, _ in enumerate(column_list):
-        # get length of longest column entry in each dataframe
-        column_widths1.append(max(len(str(row[ix])) for row in df1[column_list].itertuples(index=False)))    
-        column_widths2.append(max(len(str(row[ix])) for row in df2[column_list].itertuples(index=False)))    
+    # for each column, convert to string and get max length
+    # column_widths1 = [max(df1[col].astype(str).apply(len)) for col in column_list]
+    column_widths1 = [get_longest_entry(df1[col]) for col in column_list]
+    column_widths2 = [get_longest_entry(df2[col]) for col in column_list]
+    # column_widths2 = [max(df2[col].astype(str).apply(len)) for col in column_list]
 
     # for each column, take longest of entry in either dataframe or length of label
-    column_widths = [max(column_widths1[ix], column_widths2[ix], label_lengths[ix]) for ix, _ in enumerate(column_list)]
-
+    # column_widths = [max(column_widths1[ix], column_widths2[ix], label_lengths[ix]) for ix, _ in enumerate(column_list)]
+    column_widths = [max(get_longest_entry(df1[col]),get_longest_entry(df2[col]), len(col)) for col in column_list]
     return column_widths
 
 
